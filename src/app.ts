@@ -22,23 +22,36 @@ class App {
     this._engine = new Engine(this._canvas, true);
     this._scene = new Scene(this._engine);
 
-    var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), this._scene);
+    var camera = new ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 60, Vector3.Zero(), this._scene);
     camera.attachControl(this._canvas, true);
     var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(2, 1, 0), this._scene);
-    var cube: Mesh = MeshBuilder.CreateBox("cube", { size: 1 }, this._scene);
-    var cube2: Mesh = MeshBuilder.CreateBox("cube2", { size: 1 }, this._scene);
-    cube.setPositionWithLocalVector(new Vector3(0, 0, 0));
-    cube2.setPositionWithLocalVector(new Vector3(1, 0, 0));
 
-    // let overCube: Mesh[][] = [];
+    let x = 4;
+    let y = 4;
+    let z = 4;
 
-    // for (let row = 0; row < 3; row++) {
-    //   overCube.push([]);
-    //   for (let col = 0; col < 3; row++) {
-    //     overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}-${col}`, { size: 1 }, this._scene);
-    //     overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, 0));
-    //   }
-    // }
+    let overCube: Mesh[][] = [];
+
+    for (let row = 0; row < x; row++) {
+      let meshes: Mesh[] = [];
+      overCube.push(meshes);
+      for (let col = 0; col < y; col++) {
+        for (let depth = 0; depth < z; depth++) {
+          overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}${col}${depth}`, { size: 1 }, this._scene);
+          overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, depth));
+        }
+      }
+    }
+
+    let faceColors = [];
+
+    this._scene.onPointerDown = function (ev, pickResult) {
+      if (pickResult.hit) {
+        var box = pickResult.pickedMesh;
+        console.log(box)
+        box.isVisible = false;
+      }
+    }
 
     // hide/show the Inspector
     window.addEventListener("keydown", (ev) => {
