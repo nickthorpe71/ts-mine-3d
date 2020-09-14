@@ -1,7 +1,8 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial } from "@babylonjs/core";
+import { clipPlaneFragment } from "@babylonjs/core/Shaders/ShadersInclude/clipPlaneFragment";
 
 //enum for states
 enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
@@ -25,12 +26,31 @@ class App {
     var camera = new ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 60, Vector3.Zero(), this._scene);
     camera.attachControl(this._canvas, true);
     var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(2, 1, 0), this._scene);
+    light1.intensity = 0.7;
 
-    let x = 4;
-    let y = 4;
-    let z = 4;
+    let x: number = 4;
+    let y: number = 4;
+    let z: number = 4;
 
     let overCube: Mesh[][] = [];
+    let colors: Material[] = [];
+    let colorSwitch: number = 0;
+
+    //https://doc.babylonjs.com/babylon101/materials
+    let whiteMat = new StandardMaterial('White', this._scene);
+    whiteMat.diffuseColor = new Color3(1, 1, 1);
+    whiteMat.specularColor = new Color3(1, 1, 1);
+    whiteMat.emissiveColor = new Color3(1, 1, 1);
+    whiteMat.ambientColor = new Color3(1, 1, 1);
+
+    let blackMat = new StandardMaterial('Black', this._scene);
+    whiteMat.diffuseColor = new Color3(0, 0, 0);
+    whiteMat.specularColor = new Color3(0, 0, 0);
+    whiteMat.emissiveColor = new Color3(0, 0, 0);
+    whiteMat.ambientColor = new Color3(0, 0, 0);
+
+    colors.push(whiteMat);
+    colors.push(blackMat);
 
     for (let row = 0; row < x; row++) {
       let meshes: Mesh[] = [];
@@ -39,17 +59,17 @@ class App {
         for (let depth = 0; depth < z; depth++) {
           overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}${col}${depth}`, { size: 1 }, this._scene);
           overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, depth));
+          overCube[row][col].material = colors[colorSwitch];
+          colorSwitch = colorSwitch === 1 ? 0 : 1;
         }
       }
     }
-
-    let faceColors = [];
 
     this._scene.onPointerDown = function (ev, pickResult) {
       if (pickResult.hit) {
         var box = pickResult.pickedMesh;
         console.log(box)
-        box.isVisible = false;
+        // box.isVisible = false;
       }
     }
 
@@ -98,4 +118,9 @@ class App {
   }
 
 }
+
+function randInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 new App();
