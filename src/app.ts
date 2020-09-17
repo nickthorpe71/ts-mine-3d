@@ -23,10 +23,10 @@ class App {
     this._engine = new Engine(this._canvas, true);
     this._scene = new Scene(this._engine);
 
-    var camera = new ArcRotateCamera("Camera", 3 * Math.PI / 2, Math.PI / 4, 60, Vector3.Zero(), this._scene);
+    var camera = new ArcRotateCamera("Camera", 5 * Math.PI / 2, Math.PI / 4, 60, new Vector3(2, 2, 2), this._scene);
     camera.attachControl(this._canvas, true);
     var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(2, 1, 0), this._scene);
-    light1.intensity = 0.7;
+    light1.intensity = 1;
 
     let x: number = 4;
     let y: number = 4;
@@ -60,7 +60,7 @@ class App {
           overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}${col}${depth}`, { size: 1 }, this._scene);
           overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, depth));
           overCube[row][col].material = colors[colorSwitch];
-          colorSwitch = colorSwitch === 1 ? 0 : 1;
+          colorSwitch = colorSwitch === 2 ? 0 : colorSwitch + 1;
         }
       }
     }
@@ -69,7 +69,7 @@ class App {
       if (pickResult.hit) {
         var box = pickResult.pickedMesh;
         console.log(box)
-        // box.isVisible = false;
+        box.isVisible = false;
       }
     }
 
