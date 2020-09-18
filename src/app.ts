@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial, PointerEventTypes } from "@babylonjs/core";
 import { clipPlaneFragment } from "@babylonjs/core/Shaders/ShadersInclude/clipPlaneFragment";
 
 //enum for states
@@ -49,8 +49,15 @@ class App {
     whiteMat.emissiveColor = new Color3(0, 0, 0);
     whiteMat.ambientColor = new Color3(0, 0, 0);
 
+    let otherMat = new StandardMaterial('Black', this._scene);
+    whiteMat.diffuseColor = new Color3(2, 2, 2);
+    whiteMat.specularColor = new Color3(2, 2, 2);
+    whiteMat.emissiveColor = new Color3(2, 2, 2);
+    whiteMat.ambientColor = new Color3(2, 2, 2);
+
     colors.push(whiteMat);
     colors.push(blackMat);
+    colors.push(otherMat);
 
     for (let row = 0; row < x; row++) {
       let meshes: Mesh[] = [];
@@ -59,17 +66,29 @@ class App {
         for (let depth = 0; depth < z; depth++) {
           overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}${col}${depth}`, { size: 1 }, this._scene);
           overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, depth));
-          overCube[row][col].material = colors[colorSwitch];
-          colorSwitch = colorSwitch === 2 ? 0 : colorSwitch + 1;
+          overCube[row][col].material = colors[0];
         }
       }
     }
 
     this._scene.onPointerDown = function (ev, pickResult) {
       if (pickResult.hit) {
+
         var box = pickResult.pickedMesh;
-        console.log(box)
-        box.isVisible = false;
+
+        //console.log(box)
+        // box.isVisible = false;
+
+        if (ev.button === 0) {
+          console.log('left click');
+          box.material = colors[1];
+        }
+
+        if (ev.button === 2) {
+          console.log('right click');
+          box.material = colors[0];
+        }
+
       }
     }
 
@@ -89,7 +108,10 @@ class App {
     this._engine.runRenderLoop(() => {
       this._scene.render();
     });
+
+
   }
+
 
   //set up the canvas
   private _createCanvas(): HTMLCanvasElement {
