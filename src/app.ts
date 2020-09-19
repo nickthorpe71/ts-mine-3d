@@ -4,16 +4,11 @@ import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial, PointerEventTypes } from "@babylonjs/core";
 import { clipPlaneFragment } from "@babylonjs/core/Shaders/ShadersInclude/clipPlaneFragment";
 
-//enum for states
-enum State { START = 0, GAME = 1, LOSE = 2, CUTSCENE = 3 }
-
 class App {
   // General Entire Application
   private _scene: Scene;
   private _canvas: HTMLCanvasElement;
   private _engine: Engine;
-
-  private _state: number = 0;
 
   constructor() {
     // create the canvas html element and attach it to the webpage
@@ -34,7 +29,6 @@ class App {
 
     let overCube: Mesh[][] = [];
     let colors: Material[] = [];
-    let colorSwitch: number = 0;
 
     //https://doc.babylonjs.com/babylon101/materials
     let whiteMat = new StandardMaterial('White', this._scene);
@@ -49,7 +43,7 @@ class App {
     whiteMat.emissiveColor = new Color3(0, 0, 0);
     whiteMat.ambientColor = new Color3(0, 0, 0);
 
-    let otherMat = new StandardMaterial('Black', this._scene);
+    let otherMat = new StandardMaterial('Grey', this._scene);
     whiteMat.diffuseColor = new Color3(2, 2, 2);
     whiteMat.specularColor = new Color3(2, 2, 2);
     whiteMat.emissiveColor = new Color3(2, 2, 2);
@@ -76,7 +70,7 @@ class App {
 
         var box = pickResult.pickedMesh;
 
-        //console.log(box)
+        console.log(box)
         // box.isVisible = false;
 
         if (ev.button === 0) {
