@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial, PointerEventTypes } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Color3, Material, StandardMaterial, PointerEventTypes, DynamicTexture } from "@babylonjs/core";
 import { clipPlaneFragment } from "@babylonjs/core/Shaders/ShadersInclude/clipPlaneFragment";
 
 class App {
@@ -30,7 +30,20 @@ class App {
     let overCube: Mesh[][] = [];
     let colors: Material[] = [];
 
-    //https://doc.babylonjs.com/babylon101/materials
+
+    // create dynamic texture
+    let textureResolution: number = 512;
+    let textureGround = new DynamicTexture('bomb texture', textureResolution, this._scene, null);
+
+    let materialGround = new StandardMaterial('Mat', this._scene);
+    materialGround.diffuseTexture = textureGround;
+
+    // TODO: take the below code and make a texture for all numbers, bombs flag etc
+    //Add text to dynamic texture
+    var font = "bold 250px monospace";
+    textureGround.drawText("💣", 120, 350, font, "blue", null, true, true);
+
+    // https://doc.babylonjs.com/babylon101/materials
     let whiteMat = new StandardMaterial('White', this._scene);
     whiteMat.diffuseColor = new Color3(1, 1, 1);
     whiteMat.specularColor = new Color3(1, 1, 1);
@@ -61,6 +74,7 @@ class App {
           overCube[row][col] = MeshBuilder.CreateBox(`cube:${row}${col}${depth}`, { size: 1 }, this._scene);
           overCube[row][col].setPositionWithLocalVector(new Vector3(row, col, depth));
           overCube[row][col].material = colors[0];
+          overCube[row][col].material = materialGround;
         }
       }
     }
@@ -102,8 +116,6 @@ class App {
     this._engine.runRenderLoop(() => {
       this._scene.render();
     });
-
-
   }
 
 
